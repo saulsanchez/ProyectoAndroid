@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView lblUsuario;
     private EditText txtUsuario;
     private Button btnAceptar;
+    private MyAsyncTask myAsincTask;
 
 
     @Override
@@ -28,16 +29,20 @@ public class MainActivity extends AppCompatActivity {
         btnAceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                myAsincTask = new MyAsyncTask();
+
                 //Creamos el Intent
                 Intent intent =
                         new Intent(MainActivity.this, Resultado.class);
 
                 //Creamos la información a pasar entre actividades
                 Bundle b = new Bundle();
-                b.putString("USUARIO", txtUsuario.getText().toString());
+                b.putString("USUARIO", txtUsuario.toString());
 
                 //Añadimos la información al intent
                 intent.putExtras(b);
+
+                myAsincTask.execute();
 
                 //Iniciamos la nueva actividad
                 startActivity(intent);
