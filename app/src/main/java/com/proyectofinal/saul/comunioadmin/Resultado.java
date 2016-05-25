@@ -1,6 +1,8 @@
 package com.proyectofinal.saul.comunioadmin;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,6 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,13 +23,23 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.Console;
+import java.io.IOException;
 import java.util.Vector;
 
 public class Resultado extends AppCompatActivity {
 
     private MyAsyncTask myAsincTask;
+    ListView lstUsuarios;
+    private Usuario[] datos =
+            new Usuario[]{
+                    new Usuario("Usuario 1", 1, 1),
+                    new Usuario("Usuario 2", 2, 2),
+                    new Usuario("Usuario 3", 3, 3),
+                    new Usuario("Usuario 4", 4, 4),
+                    new Usuario("Usuario 5", 5, 5)};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +49,41 @@ public class Resultado extends AppCompatActivity {
         //Recuperamos la información pasada en el intent
         Bundle bundle = this.getIntent().getExtras();
         String user = bundle.getString("USUARIO");
+
+        AdaptadorUsuarios adaptador = new AdaptadorUsuarios(this, datos);
+
+        lstUsuarios = (ListView)findViewById(R.id.LstUsuarios);
+
+        lstUsuarios.setAdapter(adaptador);
+
         myAsincTask = new MyAsyncTask();
-        myAsincTask.execute(user);
+        //myAsincTask.execute(user);
+    }
+
+    class AdaptadorUsuarios extends ArrayAdapter<Usuario> {
+
+        Activity context;
+
+        AdaptadorUsuarios(Activity context, Usuario[] datos) {
+            super(context, R.layout.listitem_usuarios, datos);
+            this.context = context;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = context.getLayoutInflater();
+            View item = inflater.inflate(R.layout.listitem_usuarios, null);
+
+            TextView lblNombre = (TextView)item.findViewById(R.id.LblNombre);
+            lblNombre.setText(datos[position].getNombre());
+
+            TextView lblPuntos = (TextView)item.findViewById(R.id.LblPuntos);
+            lblPuntos.setText("Puntos: " + datos[position].getPuntos().toString());
+
+            TextView lblEstrellas = (TextView)item.findViewById(R.id.LblEstrellas);
+            lblEstrellas.setText("Jugadores estrella: " + datos[position].getNumEstrellas().toString());
+
+            return (item);
+        }
     }
 
     private class MyAsyncTask extends AsyncTask<String, Integer, String> {
@@ -143,11 +193,16 @@ public class Resultado extends AppCompatActivity {
                     }
                 }
 
-            } catch (Exception e) {
-                res = "ERROR: " + e.getMessage() + "\n";
+            } catch (IOException e) {
+                res = "ERROR: El ID de usuario no existe - " + e.getMessage() + "\n";
+                //Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT);
                 //e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                res = "ERROR: " + e.getMessage() + "\n";
             }
-            res = nombreUsuario + idUsuario + idComunidad + vectorUsuarios + nombreUsuarios + puntosUsuarios + "CACA";
+
+            if (res.equals(""))
+                res = nombreUsuario + idUsuario + idComunidad + vectorUsuarios + nombreUsuarios + puntosUsuarios + "CACA";
 
             return res;
         }
@@ -158,10 +213,12 @@ public class Resultado extends AppCompatActivity {
                 dialog.dismiss();
             }
 
-            TextView txt = (TextView) findViewById(R.id.txtResultado);
-            txt.setText(result);
+            //TextView txt = (TextView) findViewById(R.id.txtResultado);
+            //txt.setText(result);
         }
 
 
     }
+
+
 }
