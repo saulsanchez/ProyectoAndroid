@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Comunio Admin</string>
-    <string name="nombre">Usuario Comunio</string>
-    <string name="aceptar">Aceptar</string>
-    <string name="jornada">Jornada</string>
+    <string name="nombre">ID de usuario Comunio...</string>
+    <string name="calcular">Calcular</string>
+    <string name="jornada">JORNADA</string>
 </resources>

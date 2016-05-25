@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="jornada_array">
+        <item>Jornada 1</item>
+        <item>Jornada 2</item>
+        <item>Jornada 3</item>
+        <item>Jornada 4</item>
+        <item>Jornada 5</item>
+        <item>Jornada 6</item>
+        <item>Jornada 7</item>
+        <item>Jornada 8</item>
+        <item>Jornada 9</item>
+        <item>Jornada 10</item>
+        <item>Jornada 11</item>
+        <item>Jornada 12</item>
+        <item>Jornada 13</item>
+        <item>Jornada 14</item>
+        <item>Jornada 15</item>
+        <item>Jornada 16</item>
+        <item>Jornada 17</item>
+        <item>Jornada 18</item>
+        <item>Jornada 19</item>
+        <item>Jornada 20</item>
+        <item>Jornada 21</item>
+        <item>Jornada 22</item>
+        <item>Jornada 23</item>
+        <item>Jornada 24</item>
+        <item>Jornada 25</item>
+        <item>Jornada 26</item>
+        <item>Jornada 27</item>
+        <item>Jornada 28</item>
+        <item>Jornada 29</item>
+        <item>Jornada 30</item>
+        <item>Jornada 31</item>
+        <item>Jornada 32</item>
+        <item>Jornada 33</item>
+        <item>Jornada 34</item>
+        <item>Jornada 35</item>
+        <item>Jornada 36</item>
+        <item>Jornada 37</item>
+        <item>Jornada 38</item>
+    </string-array>
+</resources>

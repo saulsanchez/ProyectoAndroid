@@ -22,7 +22,6 @@ import java.util.Vector;
 
 public class Resultado extends AppCompatActivity {
 
-    //TextView txtUsuario;
     private MyAsyncTask myAsincTask;
 
     @Override
@@ -40,7 +39,7 @@ public class Resultado extends AppCompatActivity {
     private class MyAsyncTask extends AsyncTask<String, Integer, String> {
         private ProgressDialog dialog = new ProgressDialog(Resultado.this);
         String NAMESPACE = "http://rpc.comunio.es/soapservice.php?wsdl";
-        String URL = "http://rpc.comunio.es/soapservice.php";
+        String URL = "http://rpc.comunio.es/soapservice.php/";
 
         SoapObject request;
         SoapSerializationEnvelope envelope;
@@ -79,7 +78,7 @@ public class Resultado extends AppCompatActivity {
             envelope.setOutputSoapObject(request);
 
             try {
-                transporte.call(URL + "/" + getUserId, envelope);
+                transporte.call(URL + getUserId, envelope);
                 int userId = (int) envelope.getResponse();
                 idUsuario = "USER ID: " + userId + "\n";
 
@@ -89,7 +88,7 @@ public class Resultado extends AppCompatActivity {
                 transporte = new HttpTransportSE(URL);
                 request.addProperty("userid", userId);
                 envelope.setOutputSoapObject(request);
-                transporte.call(URL + "/" + getCommunityId, envelope);
+                transporte.call(URL + getCommunityId, envelope);
                 int communityId = (int) envelope.getResponse();
                 idComunidad = "COMUNIDAD: " + communityId + "\n";
 
@@ -99,7 +98,7 @@ public class Resultado extends AppCompatActivity {
                 transporte = new HttpTransportSE(URL);
                 request.addProperty("communityid", communityId);
                 envelope.setOutputSoapObject(request);
-                transporte.call(URL + "/" + getUsersId, envelope);
+                transporte.call(URL + getUsersId, envelope);
                 Vector communityIds = (Vector) envelope.getResponse();
                 vectorUsuarios = "IDS DE COMUNIDAD: " + "\n";
                 for (int i = 0; i < communityIds.size(); i++)
@@ -114,7 +113,7 @@ public class Resultado extends AppCompatActivity {
                     transporte = new HttpTransportSE(URL);
                     request.addProperty("userid", communityIds.get(i));
                     envelope.setOutputSoapObject(request);
-                    transporte.call(URL + "/" + getUsersFirstName, envelope);
+                    transporte.call(URL + getUsersFirstName, envelope);
                     String name = (String) envelope.getResponse();
                     userVector.add(name);
                     nombreUsuarios += "    NOMBRE: " + name + "\n";
@@ -134,13 +133,13 @@ public class Resultado extends AppCompatActivity {
 
                     envelope.setOutputSoapObject(request);
                     try {
-                        transporte.call(URL + "/" + getUserGameDayPoints, envelope);
+                        transporte.call(URL + getUserGameDayPoints, envelope);
                         int points = (int) envelope.getResponse();
                         userPoints.add("" + points);
-                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + " PUNTOS: " + points + "\n";
+                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + "- PUNTOS: " + points + "\n";
                     }
                     catch(Exception e){
-                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + " NO ACCESIBLE\n";
+                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + "- NO ACCESIBLE\n";
                     }
                 }
 

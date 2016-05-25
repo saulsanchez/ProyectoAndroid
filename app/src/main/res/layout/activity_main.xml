@@ -2,29 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView android:id="@+id/lblUsuario"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nombre" />
+    android:orientation="vertical"
+    android:background="@drawable/img_background">
 
     <EditText android:id="@+id/txtNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" />
-
-    <TextView android:id="@+id/lblJornada"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/jornada" />
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="80dp"
+        android:inputType="text"
+        android:textSize="25sp"
+        android:textColor="#ffffff"
+        android:singleLine="true"
+        android:hint="@string/nombre"
+        android:textColorHint="#238604"
+        android:textCursorDrawable="@null"
+        android:imeOptions="actionNext" /><!-- Opción de teclado que selecciona el siguiente campo-->
 
     <Spinner android:id="@+id/spnJornada"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <Button android:id="@+id/btnAceptar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/aceptar" />
+        android:textAlignment="center"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/btn_calcular"
+        android:text="@string/calcular"
+        android:textSize="25sp"
+        android:textColor="#ffffff" />
 </LinearLayout>
