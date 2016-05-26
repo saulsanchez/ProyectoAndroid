@@ -8,6 +8,8 @@ public class Usuario {
     private Integer puntos;
     private Integer numEstrellas;
 
+    public Usuario() {}
+
     public Usuario(String nombre, Integer puntos, Integer numEstrellas) {
         this.nombre = nombre;
         this.puntos = puntos;
