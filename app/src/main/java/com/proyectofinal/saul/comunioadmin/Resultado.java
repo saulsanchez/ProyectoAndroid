@@ -3,13 +3,10 @@ package com.proyectofinal.saul.comunioadmin;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,108 +17,141 @@ import android.widget.Toast;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.Console;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
-public class Resultado extends AppCompatActivity {
+public class Resultado extends Activity {
 
-    private MyAsyncTask myAsincTask;
-    ListView lstUsuarios;
-    private Usuario[] datos =
-            new Usuario[]{
-                    new Usuario("Usuario 1", 1, 1),
-                    new Usuario("Usuario 2", 2, 2),
-                    new Usuario("Usuario 3", 3, 3),
-                    new Usuario("Usuario 4", 4, 4),
-                    new Usuario("Usuario 5", 5, 5)};
+    private ListView lstUsuarios;
+    private List<Usuario> list;
+    private AdaptadorUsuarios adaptador;
+    private Bundle bundle;
+    private String user;
+    private Integer jornada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resultado);
 
-        //Recuperamos la información pasada en el intent
-        Bundle bundle = this.getIntent().getExtras();
-        String user = bundle.getString("USUARIO");
+        list = new ArrayList<>();
 
-        AdaptadorUsuarios adaptador = new AdaptadorUsuarios(this, datos);
+        //Recuperamos la información pasada en el intent
+        bundle = this.getIntent().getExtras();
+        user = bundle.getString("USUARIO");
+        jornada = bundle.getInt("JORNADA");
+
+        adaptador = new AdaptadorUsuarios(this, list);
 
         lstUsuarios = (ListView)findViewById(R.id.LstUsuarios);
 
-        lstUsuarios.setAdapter(adaptador);
+        if(adaptador!=null && lstUsuarios != null)
+            lstUsuarios.setAdapter(adaptador);
 
-        myAsincTask = new MyAsyncTask();
-        //myAsincTask.execute(user);
+        new MyAsyncTask(Resultado.this, list).execute(user, String.valueOf(jornada));
     }
 
     class AdaptadorUsuarios extends ArrayAdapter<Usuario> {
 
-        Activity context;
+        private Activity context;
+        private LayoutInflater inflater;
+        private View item;
+        private TextView lblNombre;
+        private TextView lblPuntos;
+        private TextView lblEstrellas;
+        private TextView lblBeneficio;
 
-        AdaptadorUsuarios(Activity context, Usuario[] datos) {
+        AdaptadorUsuarios(Activity context, List<Usuario> datos) {
             super(context, R.layout.listitem_usuarios, datos);
             this.context = context;
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = context.getLayoutInflater();
-            View item = inflater.inflate(R.layout.listitem_usuarios, null);
+            inflater = context.getLayoutInflater();
+            item = inflater.inflate(R.layout.listitem_usuarios, null);
 
-            TextView lblNombre = (TextView)item.findViewById(R.id.LblNombre);
-            lblNombre.setText(datos[position].getNombre());
+            lblNombre = (TextView)item.findViewById(R.id.LblNombre);
+            lblNombre.setText(list.get(position).getNombre());
 
-            TextView lblPuntos = (TextView)item.findViewById(R.id.LblPuntos);
-            lblPuntos.setText("Puntos: " + datos[position].getPuntos().toString());
+            lblPuntos = (TextView)item.findViewById(R.id.LblPuntos);
+            lblPuntos.setText("Puntos: " + list.get(position).getPuntos());
 
-            TextView lblEstrellas = (TextView)item.findViewById(R.id.LblEstrellas);
-            lblEstrellas.setText("Jugadores estrella: " + datos[position].getNumEstrellas().toString());
+            lblEstrellas = (TextView)item.findViewById(R.id.LblEstrellas);
+            lblEstrellas.setText("Jugadores estrella: " + list.get(position).getNumEstrellas());
+
+            lblBeneficio = (TextView)item.findViewById(R.id.LblBeneficio);
+            lblBeneficio.setText("Beneficio: " + list.get(position).getBeneficio());
 
             return (item);
         }
     }
 
-    private class MyAsyncTask extends AsyncTask<String, Integer, String> {
-        private ProgressDialog dialog = new ProgressDialog(Resultado.this);
-        String NAMESPACE = "http://rpc.comunio.es/soapservice.php?wsdl";
-        String URL = "http://rpc.comunio.es/soapservice.php/";
+    class MyAsyncTask extends AsyncTask<String, Void, Void> {
+        private ProgressDialog dialog;
+        private String NAMESPACE = "http://rpc.comunio.es/soapservice.php?wsdl";
+        private String URL = "http://rpc.comunio.es/soapservice.php/";
+        private Boolean existeUsuario = true;
+        private Random r = new Random();
 
-        SoapObject request;
-        SoapSerializationEnvelope envelope;
-        HttpTransportSE transporte;
+        private SoapObject request;
+        private SoapSerializationEnvelope envelope;
+        private HttpTransportSE transporte;
 
-        String getUserId = "getuserid"; //Id usuario por nombre
-        String getCommunityId = "getcommunityid"; //id comunidad por id usuario
-        String getUsersId = "getuserids"; //ids de usuarios de la comunidad por id de comunidad
-        String getUsersFirstName = "getusersfirstname"; //Primer nombre de los usuarios
-        String getUserGameDayPoints = "getusergamedaypoints"; // Puntos de usuario de liga por id de usuario y jornada
+        private Usuario usuario;
+        private List<Usuario> listaUsuarios;
+        private Context context;
 
+        private String getUserId = "getuserid"; //Id usuario por nombre
+        private String getCommunityId = "getcommunityid"; //id comunidad por id usuario
+        private String getCommunityName = "getcommunityname"; //Nombre de la liga
+        private String getUsersId = "getuserids"; //ids de usuarios de la comunidad por id de comunidad
+        private String getUsersFirstName = "getusersfirstname"; //Primer nombre de los usuarios
+        private String getUserGameDayPoints = "getusergamedaypoints"; // Puntos de usuario de liga por id de usuario y jornada
 
-        @Override
-        protected void onPreExecute() {
-            this.dialog.setMessage("Calculando puntuaciones, por favor, espere...");
-            this.dialog.show();
-            this.dialog.setCanceledOnTouchOutside(false);
+        private Integer userId;
+        private Integer communityId;
+        private Vector communityIds;
+        private String nombre;
+        private String jornada;
+        private Integer randPoints;
+        private Integer randStars;
+        private Integer points;
+
+        private SharedPreferences preferences;
+
+        private Integer precioPunto;
+        private Integer precioEstrella;
+        private Integer beneficioPuntos;
+        private Integer beneficioEstrellas;
+        private Integer beneficioTotal;
+
+        public MyAsyncTask(Context context, List<Usuario> list){
+            listaUsuarios = list;
+            this.context = context;
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(context);
+            this.dialog.setMessage("Calculando puntuaciones, por favor, espere...");
+            this.dialog.setCanceledOnTouchOutside(false);
+            this.dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
             request = new SoapObject(NAMESPACE, getUserId);
             envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             transporte = new HttpTransportSE(URL);
-
-            String res = "";
-            String nombreUsuario = "USUARIO: " + params[0] + "\n";
-            String idUsuario = "";
-            String idComunidad = "";
-            String vectorUsuarios = "";
-            String nombreUsuarios = "";
-            String puntosUsuarios = "";
 
             request.addProperty("login", params[0]);
 
@@ -129,8 +159,7 @@ public class Resultado extends AppCompatActivity {
 
             try {
                 transporte.call(URL + getUserId, envelope);
-                int userId = (int) envelope.getResponse();
-                idUsuario = "USER ID: " + userId + "\n";
+                userId = (int) envelope.getResponse();
 
                 //Con el id de usuario se saca el id de comunidad
                 request = new SoapObject(NAMESPACE, getCommunityId);
@@ -139,8 +168,15 @@ public class Resultado extends AppCompatActivity {
                 request.addProperty("userid", userId);
                 envelope.setOutputSoapObject(request);
                 transporte.call(URL + getCommunityId, envelope);
-                int communityId = (int) envelope.getResponse();
-                idComunidad = "COMUNIDAD: " + communityId + "\n";
+                communityId = (int) envelope.getResponse();
+
+                //Con el id de la comunidad sacamos el nombre de la liga
+                request = new SoapObject(NAMESPACE, getCommunityName);
+                envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                transporte = new HttpTransportSE(URL);
+                request.addProperty("communityid", communityId);
+                envelope.setOutputSoapObject(request);
+                transporte.call(URL + getCommunityName, envelope);
 
                 //Con el id de la comunidad se sacan todos los id de usuario de esa comunidad
                 request = new SoapObject(NAMESPACE, getUsersId);
@@ -149,14 +185,9 @@ public class Resultado extends AppCompatActivity {
                 request.addProperty("communityid", communityId);
                 envelope.setOutputSoapObject(request);
                 transporte.call(URL + getUsersId, envelope);
-                Vector communityIds = (Vector) envelope.getResponse();
-                vectorUsuarios = "IDS DE COMUNIDAD: " + "\n";
-                for (int i = 0; i < communityIds.size(); i++)
-                    vectorUsuarios += "    NOMBRE: " + communityIds.get(i) + "\n";
+                communityIds = (Vector) envelope.getResponse();
 
                 //Nombre usuarios por id
-                nombreUsuarios = "NOMBRES: " + "\n";
-                Vector<String> userVector = new Vector<String>();
                 for (int i = 0; i < communityIds.size(); i++) {
                     request = new SoapObject(NAMESPACE, getUsersFirstName);
                     envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -164,15 +195,15 @@ public class Resultado extends AppCompatActivity {
                     request.addProperty("userid", communityIds.get(i));
                     envelope.setOutputSoapObject(request);
                     transporte.call(URL + getUsersFirstName, envelope);
-                    String name = (String) envelope.getResponse();
-                    userVector.add(name);
-                    nombreUsuarios += "    NOMBRE: " + name + "\n";
+                    nombre = (String) envelope.getResponse();
+                    usuario = new Usuario();
+                    usuario.setNombre(nombre);
+                    listaUsuarios.add(usuario);
                 }
 
                 //Puntos por id usuario
-                int jornada = 38;
-                puntosUsuarios = "PUNTOS DE JORNADA " + jornada + ": " + "\n";
-                Vector<String> userPoints = new Vector<String>();
+                jornada = params[1];
+                Integer numEstrellas = 0;
                 for (int i = 0; i < communityIds.size(); i++) {
                     request = new SoapObject(NAMESPACE, getUserGameDayPoints);
                     envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -181,44 +212,71 @@ public class Resultado extends AppCompatActivity {
                     request.addProperty("userid", communityIds.get(i));
                     request.addProperty("gameday", jornada);
 
+                    randPoints = r.nextInt(36) + 40;
+                    randStars = r.nextInt(4);
+                    numEstrellas += randStars;
+
                     envelope.setOutputSoapObject(request);
                     try {
                         transporte.call(URL + getUserGameDayPoints, envelope);
-                        int points = (int) envelope.getResponse();
-                        userPoints.add("" + points);
-                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + "- PUNTOS: " + points + "\n";
+                        points = (int) envelope.getResponse();
+
+                        listaUsuarios.get(i).setPuntos(points.toString());
+                        Log.d("EEE", numEstrellas.toString());
+                        listaUsuarios.get(i).setNumEstrellas((numEstrellas + randStars) <= 11 ? randStars.toString() : "0");
+                        listaUsuarios.get(i).setBeneficio(calcularBeneficios(points, randStars));
                     }
                     catch(Exception e){
-                        puntosUsuarios += "    USUARIO: " + communityIds.get(i) + "- NO ACCESIBLE\n";
+                        listaUsuarios.get(i).setPuntos(randPoints.toString());
+                        Log.d("EEE", numEstrellas.toString());
+                        listaUsuarios.get(i).setNumEstrellas((numEstrellas + randStars) <= 11 ? randStars.toString() : "0");
+                        listaUsuarios.get(i).setBeneficio(calcularBeneficios(randPoints, randStars));
                     }
                 }
 
+                Collections.sort(listaUsuarios, new Comparator<Usuario>() {
+                    @Override
+                    public int compare(Usuario u1, Usuario u2) {
+                        return Integer.valueOf(u2.getPuntos()).compareTo(Integer.valueOf(u1.getPuntos()));
+                    }
+                });
+
             } catch (IOException e) {
-                res = "ERROR: El ID de usuario no existe - " + e.getMessage() + "\n";
-                //Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT);
-                //e.printStackTrace();
+                existeUsuario = false;
+                finish();
             } catch (XmlPullParserException e) {
-                res = "ERROR: " + e.getMessage() + "\n";
+                Log.d("ERROR", "Error: " + e.getMessage());
             }
 
-            if (res.equals(""))
-                res = nombreUsuario + idUsuario + idComunidad + vectorUsuarios + nombreUsuarios + puntosUsuarios + "CACA";
-
-            return res;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Void result) {
             if (dialog.isShowing()) {
                 dialog.dismiss();
             }
 
-            //TextView txt = (TextView) findViewById(R.id.txtResultado);
-            //txt.setText(result);
+            if (!existeUsuario)
+                Toast.makeText(getApplicationContext(), "El usuario no existe en Comunio", Toast.LENGTH_SHORT).show();
+
+            adaptador.notifyDataSetChanged();
         }
 
+        public String calcularBeneficios(Integer puntos, Integer estrellas) {
+            preferences = getSharedPreferences("MisPreferencias", MODE_PRIVATE);
 
+            precioPunto = preferences.getInt("precioPunto", 0);
+            precioEstrella = preferences.getInt("precioEstrella", 0);
+            beneficioPuntos = puntos * precioPunto;
+            beneficioEstrellas = estrellas * precioEstrella;
+
+            if(puntos <= 0)
+                beneficioTotal = beneficioEstrellas;
+            else
+                beneficioTotal = beneficioPuntos + beneficioEstrellas;
+
+            return beneficioTotal.toString();
+        }
     }
-
-
 }

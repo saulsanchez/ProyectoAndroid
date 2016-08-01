@@ -5,16 +5,11 @@ package com.proyectofinal.saul.comunioadmin;
  */
 public class Usuario {
     private String nombre;
-    private Integer puntos;
-    private Integer numEstrellas;
+    private String puntos;
+    private String numEstrellas;
+    private String beneficio;
 
     public Usuario() {}
-
-    public Usuario(String nombre, Integer puntos, Integer numEstrellas) {
-        this.nombre = nombre;
-        this.puntos = puntos;
-        this.numEstrellas = numEstrellas;
-    }
 
     public String getNombre() {
         return nombre;
@@ -24,19 +19,27 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public Integer getPuntos() {
+    public String getPuntos() {
         return puntos;
     }
 
-    public void setPuntos(Integer puntos) {
+    public void setPuntos(String puntos) {
         this.puntos = puntos;
     }
 
-    public Integer getNumEstrellas() {
+    public String getNumEstrellas() {
         return numEstrellas;
     }
 
-    public void setNumEstrellas(Integer numEstrellas) {
+    public void setNumEstrellas(String numEstrellas) {
         this.numEstrellas = numEstrellas;
+    }
+
+    public String getBeneficio() {
+        return beneficio;
+    }
+
+    public void setBeneficio(String beneficio) {
+        this.beneficio = beneficio;
     }
 }

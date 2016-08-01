@@ -17,6 +17,9 @@
         <activity android:name=".Resultado"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".Preferencias"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="portrait">

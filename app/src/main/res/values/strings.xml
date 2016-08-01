@@ -3,4 +3,11 @@
     <string name="nombre">ID de usuario Comunio...</string>
     <string name="calcular">Calcular</string>
     <string name="jornada">JORNADA</string>
+    <string name="menu_preferencias">Preferencias</string>
+    <string name="precio_punto">Precio por punto:</string>
+    <string name="precio_estrella">Precio por jugador estrella:</string>
+    <string name="precio_puesto1">Precio por 1º de la jornada:</string>
+    <string name="precio_puesto2">Precio por 2º de la jornada:</string>
+    <string name="precio_puesto3">Precio por 3º de la jornada:</string>
+    <string name="guardar_preferencias">Guardar</string>
 </resources>
