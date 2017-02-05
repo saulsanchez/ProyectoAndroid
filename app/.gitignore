@@ -39,5 +39,4 @@ captures/
 *.jks
 
 # idea
-/.idea/workspace.xml
-/.idea/libraries
+/.idea
